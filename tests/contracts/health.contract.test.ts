@@ -8,7 +8,7 @@ describe('GET /health contract', () => {
 
   it('response matches health response contract when GET /health is called', async () => {
     // Arrange
-    const request = { method: 'GET' as const, url: '/health' };
+    const request = { method: 'GET' as const, url: '/v1/health' };
 
     // Act
     const response = await app.inject(request);

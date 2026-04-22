@@ -10,6 +10,11 @@ export const notImplementedContract = {
   code: 'NOT_IMPLEMENTED',
 };
 
+export const invalidRequestContract = {
+  error: expect.any(String),
+  code: 'INVALID_REQUEST',
+};
+
 export const errorResponseContract = {
   error: expect.any(String),
   code: expect.stringMatching(/^[A-Z_]+$/),

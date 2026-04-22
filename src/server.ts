@@ -3,7 +3,10 @@ import { config } from './config';
 import { healthRoutes } from './routes/health';
 import { debugRoutes } from './routes/debug';
 
-export const app = Fastify({ logger: true });
+export const app = Fastify({
+  logger: true,
+  ajv: { customOptions: { coerceTypes: false } },
+});
 app.register(healthRoutes);
 app.register(debugRoutes);
 

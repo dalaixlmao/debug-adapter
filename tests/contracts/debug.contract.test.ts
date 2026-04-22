@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { app } from '../../src/server';
-import { unsupportedMediaTypeContract, notImplementedContract } from './debug.contract';
+import { unsupportedMediaTypeContract, notImplementedContract, invalidRequestContract } from './debug.contract';
 
 describe('POST /v1/debug contract', () => {
   beforeAll(async () => { await app.ready(); });
@@ -12,7 +12,7 @@ describe('POST /v1/debug contract', () => {
       method: 'POST' as const,
       url: '/v1/debug',
       headers: { 'content-type': 'application/json' },
-      payload: JSON.stringify({ foo: 'bar' }),
+      payload: JSON.stringify({ language: 'typescript', code: 'let x = 1' }),
     };
 
     // Act
@@ -38,5 +38,22 @@ describe('POST /v1/debug contract', () => {
     // Assert
     expect(response.statusCode).toBe(415);
     expect(JSON.parse(response.payload)).toEqual(unsupportedMediaTypeContract);
+  });
+
+  it('response matches invalid request contract when required field is missing', async () => {
+    // Arrange
+    const request = {
+      method: 'POST' as const,
+      url: '/v1/debug',
+      headers: { 'content-type': 'application/json' },
+      payload: JSON.stringify({ code: 'let x = 1' }),
+    };
+
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.payload)).toMatchObject(invalidRequestContract);
   });
 });

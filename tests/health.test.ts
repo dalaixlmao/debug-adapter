@@ -23,7 +23,7 @@ describe('Health API', () => {
     describe('happy path', () => {
       it('returns 200 with expected payload when GET /health is called', async () => {
         // Arrange
-        const request = { method: 'GET' as const, url: '/health' };
+        const request = { method: 'GET' as const, url: '/v1/health' };
 
         // Act
         const response = await app.inject(request);
@@ -39,7 +39,7 @@ describe('Health API', () => {
 
       it('returns JSON content-type when GET /health is called', async () => {
         // Arrange
-        const request = { method: 'GET' as const, url: '/health' };
+        const request = { method: 'GET' as const, url: '/v1/health' };
 
         // Act
         const response = await app.inject(request);

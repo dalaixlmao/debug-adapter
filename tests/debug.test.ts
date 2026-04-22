@@ -12,13 +12,13 @@ describe('Debug API', () => {
 
   describe('POST /v1/debug', () => {
     describe('happy path', () => {
-      it('returns 501 with NOT_IMPLEMENTED error when JSON body is sent', async () => {
+      it('returns 501 with NOT_IMPLEMENTED error when valid JSON body is sent', async () => {
         // Arrange
         const request = {
           method: 'POST' as const,
           url: '/v1/debug',
           headers: { 'content-type': 'application/json' },
-          payload: JSON.stringify({ foo: 'bar' }),
+          payload: JSON.stringify({ language: 'typescript', code: 'let x = 1' }),
         };
 
         // Act
@@ -32,13 +32,13 @@ describe('Debug API', () => {
         });
       });
 
-      it('returns JSON content-type when JSON body is sent', async () => {
+      it('returns JSON content-type when valid JSON body is sent', async () => {
         // Arrange
         const request = {
           method: 'POST' as const,
           url: '/v1/debug',
           headers: { 'content-type': 'application/json' },
-          payload: JSON.stringify({ foo: 'bar' }),
+          payload: JSON.stringify({ language: 'typescript', code: 'let x = 1' }),
         };
 
         // Act
@@ -46,6 +46,75 @@ describe('Debug API', () => {
 
         // Assert
         expect(response.headers['content-type']).toContain('application/json');
+      });
+
+      it('ignores extra unknown fields and passes through when body is valid', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'typescript', code: 'let x = 1', unknown: 'field' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(501);
+      });
+    });
+
+    describe('body schema validation', () => {
+      it('returns 400 with INVALID_REQUEST when language field is missing', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ code: 'let x = 1' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+        expect(JSON.parse(response.payload).code).toBe('INVALID_REQUEST');
+      });
+
+      it('returns 400 with INVALID_REQUEST when code field is missing', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'typescript' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+        expect(JSON.parse(response.payload).code).toBe('INVALID_REQUEST');
+      });
+
+      it('returns 400 with INVALID_REQUEST when language is an integer', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 42, code: 'let x = 1' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+        expect(JSON.parse(response.payload).code).toBe('INVALID_REQUEST');
       });
     });
 
@@ -75,7 +144,7 @@ describe('Debug API', () => {
         const request = {
           method: 'POST' as const,
           url: '/v1/debug',
-          payload: JSON.stringify({ foo: 'bar' }),
+          payload: JSON.stringify({ language: 'typescript', code: 'let x = 1' }),
         };
 
         // Act

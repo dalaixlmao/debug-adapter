@@ -15,7 +15,7 @@ afterAll(async () => {
 });
 
 describe('Health API', () => {
-  it('returns 200 and the expected JSON payload', async () => {
+  it('returns 200 with JSON payload when GET /health is called', async () => {
     // Arrange
     const request = { method: 'GET' as const, url: '/health' };
 

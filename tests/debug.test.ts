@@ -10,7 +10,7 @@ describe('Debug API', () => {
     await app.close();
   });
 
-  it('returns 501 for POST /v1/debug with JSON body', async () => {
+  it('returns 501 when POST /v1/debug receives JSON body', async () => {
     // Arrange
     const request = {
       method: 'POST' as const,
@@ -31,7 +31,7 @@ describe('Debug API', () => {
     });
   });
 
-  it('returns 415 for POST /v1/debug with text/plain body', async () => {
+  it('returns 415 when POST /v1/debug receives text/plain body', async () => {
     // Arrange
     const request = {
       method: 'POST' as const,
@@ -51,7 +51,7 @@ describe('Debug API', () => {
     });
   });
 
-  it('returns 404 for GET /v1/debug', async () => {
+  it('returns 404 when GET /v1/debug is called', async () => {
     // Arrange
     const request = { method: 'GET' as const, url: '/v1/debug' };
 

@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync } from 'fastify';
 import type { ErrorResponse } from '../contracts';
-import { DebugController } from '../controllers/debug.controller';
+import { debugController } from '../container';
 
 const errorResponseSchema = {
   type: 'object',
@@ -14,8 +14,6 @@ const errorResponseSchema = {
 } as const;
 
 export const debugRoutes: FastifyPluginAsync = async (app) => {
-  const controller = new DebugController()
-
   app.post<{ Reply: ErrorResponse }>(
     '/v1/debug',
     {
@@ -36,6 +34,6 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
         }
       },
     },
-    controller.startSession.bind(controller)
+    debugController.startSession.bind(debugController)
   );
 };

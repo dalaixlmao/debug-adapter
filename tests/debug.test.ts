@@ -18,7 +18,7 @@ describe('Debug API', () => {
           method: 'POST' as const,
           url: '/v1/debug',
           headers: { 'content-type': 'application/json' },
-          payload: JSON.stringify({ language: 'typescript', code: 'let x = 1' }),
+          payload: JSON.stringify({ language: 'python', code: 'print("hi")' }),
         };
 
         // Act
@@ -38,7 +38,7 @@ describe('Debug API', () => {
           method: 'POST' as const,
           url: '/v1/debug',
           headers: { 'content-type': 'application/json' },
-          payload: JSON.stringify({ language: 'typescript', code: 'let x = 1' }),
+          payload: JSON.stringify({ language: 'python', code: 'print("hi")' }),
         };
 
         // Act
@@ -54,7 +54,7 @@ describe('Debug API', () => {
           method: 'POST' as const,
           url: '/v1/debug',
           headers: { 'content-type': 'application/json' },
-          payload: JSON.stringify({ language: 'typescript', code: 'let x = 1', unknown: 'field' }),
+          payload: JSON.stringify({ language: 'python', code: 'print("hi")', unknown: 'field' }),
         };
 
         // Act
@@ -144,7 +144,7 @@ describe('Debug API', () => {
         const request = {
           method: 'POST' as const,
           url: '/v1/debug',
-          payload: JSON.stringify({ language: 'typescript', code: 'let x = 1' }),
+          payload: JSON.stringify({ language: 'python', code: 'print("hi")' }),
         };
 
         // Act
@@ -156,6 +156,77 @@ describe('Debug API', () => {
           error: 'Unsupported Media Type',
           code: 'UNSUPPORTED_MEDIA_TYPE',
         });
+      });
+    });
+
+    describe('language validation', () => {
+      it('returns 400 with UNSUPPORTED_LANGUAGE when language is "rust"', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'rust', code: 'fn main() {}' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+        const body = JSON.parse(response.payload);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+        expect(body.code).toBe('UNSUPPORTED_LANGUAGE');
+        expect(body.error).toContain('python');
+        expect(body.error).toContain('javascript');
+      });
+
+      it('passes language validation when language is "python"', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'python', code: 'print("hi")' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(501);
+      });
+
+      it('returns 400 with UNSUPPORTED_LANGUAGE when language is "Python" (case-sensitive)', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'Python', code: 'print("hi")' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+        expect(JSON.parse(response.payload).code).toBe('UNSUPPORTED_LANGUAGE');
+      });
+
+      it('passes language validation when language is "javascript"', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'javascript', code: 'console.log(1)' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(501);
       });
     });
 

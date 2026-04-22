@@ -15,6 +15,11 @@ export const invalidRequestContract = {
   code: 'INVALID_REQUEST',
 };
 
+export const unsupportedLanguageContract = {
+  error: expect.stringMatching(/python/),
+  code: 'UNSUPPORTED_LANGUAGE',
+};
+
 export const errorResponseContract = {
   error: expect.any(String),
   code: expect.stringMatching(/^[A-Z_]+$/),

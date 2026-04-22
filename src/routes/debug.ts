@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from 'fastify';
 import type { ErrorResponse } from '../contracts';
+import { DebugController } from '../controllers/debug.controller';
 
 const errorResponseSchema = {
   type: 'object',
@@ -13,6 +14,8 @@ const errorResponseSchema = {
 } as const;
 
 export const debugRoutes: FastifyPluginAsync = async (app) => {
+  const controller = new DebugController()
+
   app.post<{ Reply: ErrorResponse }>(
     '/v1/debug',
     {
@@ -33,11 +36,6 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
         }
       },
     },
-    async (_request, reply) => {
-      return reply.status(501).send({
-        error: 'Coming soon',
-        code: 'NOT_IMPLEMENTED',
-      });
-    }
+    controller.startSession.bind(controller)
   );
 };

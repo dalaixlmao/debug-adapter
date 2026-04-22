@@ -1,7 +1,11 @@
 import type { FastifyPluginAsync } from 'fastify';
 import type { HealthResponse } from '../contracts';
+import { HealthController } from '../controllers/health.controller';
+import { HealthService } from '../services/health.service';
 
 export const healthRoutes: FastifyPluginAsync<{ version: string }> = async (app, options) => {
+  const controller = new HealthController(new HealthService(), options.version)
+
   app.get<{ Reply: HealthResponse }>(
     '/v1/health',
     {
@@ -20,10 +24,6 @@ export const healthRoutes: FastifyPluginAsync<{ version: string }> = async (app,
         },
       },
     },
-    async () => ({
-      status: 'ok',
-      active_sessions: 0,
-      version: options.version,
-    })
+    controller.getHealth.bind(controller)
   );
 };

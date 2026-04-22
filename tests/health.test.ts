@@ -19,7 +19,7 @@ describe('Health API', () => {
     await app.close();
   });
 
-  it('returns 200 with JSON payload when GET /health is called', async () => {
+  it('returns 200 with expected payload when GET /health is called', async () => {
     // Arrange
     const request = { method: 'GET' as const, url: '/health' };
 
@@ -28,13 +28,21 @@ describe('Health API', () => {
 
     // Assert
     expect(response.statusCode).toBe(200);
-    expect(response.headers['content-type']).toContain('application/json');
-
-    const payload = JSON.parse(response.payload);
-    expect(payload).toEqual({
+    expect(JSON.parse(response.payload)).toEqual({
       status: 'ok',
       activeSessions: 0,
       version: packageJson.version,
     });
+  });
+
+  it('returns JSON content-type when GET /health is called', async () => {
+    // Arrange
+    const request = { method: 'GET' as const, url: '/health' };
+
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
+    expect(response.headers['content-type']).toContain('application/json');
   });
 });

@@ -6,15 +6,15 @@ import { app } from '../src/server';
 const packageJsonPath = path.join(__dirname, '../package.json');
 const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as { version: string };
 
-beforeAll(async () => {
-  await app.ready();
-});
-
-afterAll(async () => {
-  await app.close();
-});
-
 describe('Health API', () => {
+  beforeAll(async () => {
+    await app.ready();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
   it('returns 200 with JSON payload when GET /health is called', async () => {
     // Arrange
     const request = { method: 'GET' as const, url: '/health' };

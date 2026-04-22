@@ -10,10 +10,10 @@ describe('Debug API', () => {
     await app.close();
   });
 
-  it('returns 501 for POST /debug with JSON body', async () => {
+  it('returns 501 for POST /v1/debug with JSON body', async () => {
     const response = await app.inject({
       method: 'POST',
-      url: '/debug',
+      url: '/v1/debug',
       headers: {
         'content-type': 'application/json',
       },
@@ -23,17 +23,15 @@ describe('Debug API', () => {
     expect(response.statusCode).toBe(501);
     expect(response.headers['content-type']).toContain('application/json');
     expect(JSON.parse(response.payload)).toEqual({
-      error: {
-        code: 'NOT_IMPLEMENTED',
-        message: 'Coming soon',
-      },
+      error: 'Coming soon',
+      code: 'NOT_IMPLEMENTED',
     });
   });
 
-  it('returns 415 for POST /debug with text/plain body', async () => {
+  it('returns 415 for POST /v1/debug with text/plain body', async () => {
     const response = await app.inject({
       method: 'POST',
-      url: '/debug',
+      url: '/v1/debug',
       headers: {
         'content-type': 'text/plain',
       },
@@ -42,17 +40,15 @@ describe('Debug API', () => {
 
     expect(response.statusCode).toBe(415);
     expect(JSON.parse(response.payload)).toEqual({
-      error: {
-        code: 'UNSUPPORTED_MEDIA_TYPE',
-        message: 'Unsupported Media Type',
-      },
+      error: 'Unsupported Media Type',
+      code: 'UNSUPPORTED_MEDIA_TYPE',
     });
   });
 
-  it('returns 404 for GET /debug', async () => {
+  it('returns 404 for GET /v1/debug', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: '/debug',
+      url: '/v1/debug',
     });
 
     expect(response.statusCode).toBe(404);

@@ -20,6 +20,11 @@ export const unsupportedLanguageContract = {
   code: 'UNSUPPORTED_LANGUAGE',
 };
 
+export const emptyCodeContract = {
+  error: expect.any(String),
+  code: 'EMPTY_CODE',
+};
+
 export const errorResponseContract = {
   error: expect.any(String),
   code: expect.stringMatching(/^[A-Z_]+$/),

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { app } from '../../src/server';
-import { unsupportedMediaTypeContract, notImplementedContract, invalidRequestContract, unsupportedLanguageContract } from './debug.contract';
+import { unsupportedMediaTypeContract, notImplementedContract, invalidRequestContract, unsupportedLanguageContract, emptyCodeContract } from './debug.contract';
 
 describe('POST /v1/debug contract', () => {
   beforeAll(async () => { await app.ready(); });
@@ -72,5 +72,22 @@ describe('POST /v1/debug contract', () => {
     // Assert
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.payload)).toMatchObject(invalidRequestContract);
+  });
+
+  it('response matches empty code contract when code is whitespace-only', async () => {
+    // Arrange
+    const request = {
+      method: 'POST' as const,
+      url: '/v1/debug',
+      headers: { 'content-type': 'application/json' },
+      payload: JSON.stringify({ language: 'python', code: '   ' }),
+    };
+
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.payload)).toMatchObject(emptyCodeContract);
   });
 });

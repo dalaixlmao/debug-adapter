@@ -14,6 +14,13 @@ export class DebugController {
       });
     }
 
+    if (request.body.code.trim().length === 0) {
+      return reply.status(400).send({
+        error: 'Code must not be empty or whitespace-only',
+        code: ErrorCode.EMPTY_CODE,
+      });
+    }
+
     await reply.status(501).send({
       error: 'Coming soon',
       code: 'NOT_IMPLEMENTED',

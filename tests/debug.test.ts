@@ -230,6 +230,58 @@ describe('Debug API', () => {
       });
     });
 
+    describe('empty code validation', () => {
+      it('returns 400 with EMPTY_CODE when code is empty string', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'python', code: '' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+        expect(JSON.parse(response.payload).code).toBe('EMPTY_CODE');
+      });
+
+      it('returns 400 with EMPTY_CODE when code is whitespace-only', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'python', code: ' \n\t ' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+        expect(JSON.parse(response.payload).code).toBe('EMPTY_CODE');
+      });
+
+      it('passes empty code check when code is non-empty', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'python', code: 'x = 1' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(501);
+      });
+    });
+
     describe('edge cases', () => {
       it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when body is empty and content-type is absent', async () => {
         // Arrange

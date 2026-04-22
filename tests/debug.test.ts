@@ -76,4 +76,57 @@ describe('Debug API', () => {
     // Assert
     expect(response.statusCode).toBe(404);
   });
+
+  it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when content-type header is absent', async () => {
+    // Arrange
+    const request = {
+      method: 'POST' as const,
+      url: '/v1/debug',
+      payload: JSON.stringify({ foo: 'bar' }),
+    };
+
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
+    expect(response.statusCode).toBe(415);
+    expect(JSON.parse(response.payload)).toEqual({
+      error: 'Unsupported Media Type',
+      code: 'UNSUPPORTED_MEDIA_TYPE',
+    });
+  });
+
+  it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when body is empty and content-type is absent', async () => {
+    // Arrange
+    const request = {
+      method: 'POST' as const,
+      url: '/v1/debug',
+    };
+
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
+    expect(response.statusCode).toBe(415);
+    expect(JSON.parse(response.payload)).toEqual({
+      error: 'Unsupported Media Type',
+      code: 'UNSUPPORTED_MEDIA_TYPE',
+    });
+  });
+
+  it('returns 400 when body is malformed JSON', async () => {
+    // Arrange
+    const request = {
+      method: 'POST' as const,
+      url: '/v1/debug',
+      headers: { 'content-type': 'application/json' },
+      payload: '{bad',
+    };
+
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
+    expect(response.statusCode).toBe(400);
+  });
 });

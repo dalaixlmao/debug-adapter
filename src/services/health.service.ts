@@ -8,7 +8,7 @@ export class HealthService implements IHealthService {
   getHealth(version: string): HealthResponse {
     return {
       status: 'ok',
-      active_sessions: 0,
+      activeSessions: 0,
       version,
     }
   }

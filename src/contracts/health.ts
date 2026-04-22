@@ -1,5 +1,5 @@
 export interface HealthResponse {
   readonly status: string
-  readonly active_sessions: number
+  readonly activeSessions: number
   readonly version: string
 }

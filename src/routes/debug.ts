@@ -1,43 +1,25 @@
 import type { FastifyPluginAsync } from 'fastify';
+import type { ErrorResponse } from '../contracts';
+
+const errorResponseSchema = {
+  type: 'object',
+  properties: {
+    error: { type: 'string' },
+    code: { type: 'string' },
+    requestId: { type: 'string' },
+  },
+  required: ['error', 'code'],
+  additionalProperties: false,
+} as const;
 
 export const debugRoutes: FastifyPluginAsync = async (app) => {
-  app.post(
+  app.post<{ Reply: ErrorResponse }>(
     '/debug',
     {
       schema: {
         response: {
-          415: {
-            type: 'object',
-            properties: {
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string' },
-                  message: { type: 'string' },
-                },
-                required: ['code', 'message'],
-                additionalProperties: false,
-              },
-            },
-            required: ['error'],
-            additionalProperties: false,
-          },
-          501: {
-            type: 'object',
-            properties: {
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string' },
-                  message: { type: 'string' },
-                },
-                required: ['code', 'message'],
-                additionalProperties: false,
-              },
-            },
-            required: ['error'],
-            additionalProperties: false,
-          },
+          415: errorResponseSchema,
+          501: errorResponseSchema,
         },
       },
       preValidation: async (request, reply) => {
@@ -45,20 +27,16 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
 
         if (!contentType || !contentType.includes('application/json')) {
           return reply.status(415).send({
-            error: {
-              code: 'UNSUPPORTED_MEDIA_TYPE',
-              message: 'Unsupported Media Type',
-            },
+            error: 'Unsupported Media Type',
+            code: 'UNSUPPORTED_MEDIA_TYPE',
           });
         }
       },
     },
-    async (request, reply) => {
+    async (_request, reply) => {
       return reply.status(501).send({
-        error: {
-          code: 'NOT_IMPLEMENTED',
-          message: 'Coming soon',
-        },
+        error: 'Coming soon',
+        code: 'NOT_IMPLEMENTED',
       });
     }
   );

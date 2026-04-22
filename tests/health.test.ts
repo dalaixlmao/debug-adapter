@@ -27,7 +27,7 @@ describe('Health API', () => {
     const payload = JSON.parse(response.payload);
     expect(payload).toEqual({
       status: 'ok',
-      active_sessions: 0,
+      activeSessions: 0,
       version: packageJson.version,
     });
   });

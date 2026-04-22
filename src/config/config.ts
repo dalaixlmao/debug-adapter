@@ -6,8 +6,8 @@ const DEFAULT_PORT             = 3000;
 const DEFAULT_DEBUG_TIMEOUT_MS = 5000;
 const DEFAULT_MAX_STEPS        = 100;
 
-export const SUPPORTED_LANGUAGES = ['python', 'javascript'] as const;
-export type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
+export type SupportedLanguage = 'c++' | 'java' | 'python' | 'javascript' | 'golang';
+export const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ['c++', 'java', 'python', 'javascript', 'golang'];
 
 export const config =  {
   PORT:             parseInt(process.env.PORT ?? DEFAULT_PORT.toString(), 10),

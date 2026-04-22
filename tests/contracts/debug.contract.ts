@@ -16,7 +16,7 @@ export const invalidRequestContract = {
 };
 
 export const unsupportedLanguageContract = {
-  error: expect.stringMatching(/python/),
+  error: expect.stringMatching(/python.*javascript|javascript.*python/),
   code: 'UNSUPPORTED_LANGUAGE',
 };
 

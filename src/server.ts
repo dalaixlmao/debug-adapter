@@ -6,7 +6,11 @@ import { healthRoutes } from './routes/health';
 import { debugRoutes } from './routes/debug';
 
 const packageJsonPath = path.join(__dirname, '../package.json');
-const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as { version: string };
+const packageJsonRaw: unknown = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+if (typeof packageJsonRaw !== 'object' || packageJsonRaw === null || !('version' in packageJsonRaw) || typeof (packageJsonRaw as Record<string, unknown>)['version'] !== 'string') {
+  throw new Error('package.json is missing a valid version field')
+}
+const packageJson = packageJsonRaw as { version: string };
 
 export const app = Fastify({ logger: true });
 app.register(healthRoutes, { version: packageJson.version });

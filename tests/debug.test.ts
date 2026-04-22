@@ -10,123 +10,133 @@ describe('Debug API', () => {
     await app.close();
   });
 
-  it('returns 501 with NOT_IMPLEMENTED error when POST /v1/debug receives JSON body', async () => {
-    // Arrange
-    const request = {
-      method: 'POST' as const,
-      url: '/v1/debug',
-      headers: { 'content-type': 'application/json' },
-      payload: JSON.stringify({ foo: 'bar' }),
-    };
+  describe('POST /v1/debug', () => {
+    describe('happy path', () => {
+      it('returns 501 with NOT_IMPLEMENTED error when JSON body is sent', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ foo: 'bar' }),
+        };
 
-    // Act
-    const response = await app.inject(request);
+        // Act
+        const response = await app.inject(request);
 
-    // Assert
-    expect(response.statusCode).toBe(501);
-    expect(JSON.parse(response.payload)).toEqual({
-      error: 'Coming soon',
-      code: 'NOT_IMPLEMENTED',
+        // Assert
+        expect(response.statusCode).toBe(501);
+        expect(JSON.parse(response.payload)).toEqual({
+          error: 'Coming soon',
+          code: 'NOT_IMPLEMENTED',
+        });
+      });
+
+      it('returns JSON content-type when JSON body is sent', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ foo: 'bar' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.headers['content-type']).toContain('application/json');
+      });
+    });
+
+    describe('content-type validation', () => {
+      it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when content-type is text/plain', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'text/plain' },
+          payload: 'plain text body',
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(415);
+        expect(JSON.parse(response.payload)).toEqual({
+          error: 'Unsupported Media Type',
+          code: 'UNSUPPORTED_MEDIA_TYPE',
+        });
+      });
+
+      it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when content-type header is absent', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          payload: JSON.stringify({ foo: 'bar' }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(415);
+        expect(JSON.parse(response.payload)).toEqual({
+          error: 'Unsupported Media Type',
+          code: 'UNSUPPORTED_MEDIA_TYPE',
+        });
+      });
+    });
+
+    describe('edge cases', () => {
+      it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when body is empty and content-type is absent', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(415);
+        expect(JSON.parse(response.payload)).toEqual({
+          error: 'Unsupported Media Type',
+          code: 'UNSUPPORTED_MEDIA_TYPE',
+        });
+      });
+
+      it('returns 400 when body is malformed JSON', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: '{bad',
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+      });
     });
   });
 
-  it('returns JSON content-type when POST /v1/debug receives JSON body', async () => {
-    // Arrange
-    const request = {
-      method: 'POST' as const,
-      url: '/v1/debug',
-      headers: { 'content-type': 'application/json' },
-      payload: JSON.stringify({ foo: 'bar' }),
-    };
+  describe('GET /v1/debug', () => {
+    it('returns 404 when GET /v1/debug is called', async () => {
+      // Arrange
+      const request = { method: 'GET' as const, url: '/v1/debug' };
 
-    // Act
-    const response = await app.inject(request);
+      // Act
+      const response = await app.inject(request);
 
-    // Assert
-    expect(response.headers['content-type']).toContain('application/json');
-  });
-
-  it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when POST /v1/debug receives text/plain body', async () => {
-    // Arrange
-    const request = {
-      method: 'POST' as const,
-      url: '/v1/debug',
-      headers: { 'content-type': 'text/plain' },
-      payload: 'plain text body',
-    };
-
-    // Act
-    const response = await app.inject(request);
-
-    // Assert
-    expect(response.statusCode).toBe(415);
-    expect(JSON.parse(response.payload)).toEqual({
-      error: 'Unsupported Media Type',
-      code: 'UNSUPPORTED_MEDIA_TYPE',
+      // Assert
+      expect(response.statusCode).toBe(404);
     });
-  });
-
-  it('returns 404 when GET /v1/debug is called', async () => {
-    // Arrange
-    const request = { method: 'GET' as const, url: '/v1/debug' };
-
-    // Act
-    const response = await app.inject(request);
-
-    // Assert
-    expect(response.statusCode).toBe(404);
-  });
-
-  it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when content-type header is absent', async () => {
-    // Arrange
-    const request = {
-      method: 'POST' as const,
-      url: '/v1/debug',
-      payload: JSON.stringify({ foo: 'bar' }),
-    };
-
-    // Act
-    const response = await app.inject(request);
-
-    // Assert
-    expect(response.statusCode).toBe(415);
-    expect(JSON.parse(response.payload)).toEqual({
-      error: 'Unsupported Media Type',
-      code: 'UNSUPPORTED_MEDIA_TYPE',
-    });
-  });
-
-  it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when body is empty and content-type is absent', async () => {
-    // Arrange
-    const request = {
-      method: 'POST' as const,
-      url: '/v1/debug',
-    };
-
-    // Act
-    const response = await app.inject(request);
-
-    // Assert
-    expect(response.statusCode).toBe(415);
-    expect(JSON.parse(response.payload)).toEqual({
-      error: 'Unsupported Media Type',
-      code: 'UNSUPPORTED_MEDIA_TYPE',
-    });
-  });
-
-  it('returns 400 when body is malformed JSON', async () => {
-    // Arrange
-    const request = {
-      method: 'POST' as const,
-      url: '/v1/debug',
-      headers: { 'content-type': 'application/json' },
-      payload: '{bad',
-    };
-
-    // Act
-    const response = await app.inject(request);
-
-    // Assert
-    expect(response.statusCode).toBe(400);
   });
 });

@@ -19,30 +19,34 @@ describe('Health API', () => {
     await app.close();
   });
 
-  it('returns 200 with expected payload when GET /health is called', async () => {
-    // Arrange
-    const request = { method: 'GET' as const, url: '/health' };
+  describe('GET /health', () => {
+    describe('happy path', () => {
+      it('returns 200 with expected payload when GET /health is called', async () => {
+        // Arrange
+        const request = { method: 'GET' as const, url: '/health' };
 
-    // Act
-    const response = await app.inject(request);
+        // Act
+        const response = await app.inject(request);
 
-    // Assert
-    expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.payload)).toEqual({
-      status: 'ok',
-      activeSessions: 0,
-      version: packageJson.version,
+        // Assert
+        expect(response.statusCode).toBe(200);
+        expect(JSON.parse(response.payload)).toEqual({
+          status: 'ok',
+          activeSessions: 0,
+          version: packageJson.version,
+        });
+      });
+
+      it('returns JSON content-type when GET /health is called', async () => {
+        // Arrange
+        const request = { method: 'GET' as const, url: '/health' };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.headers['content-type']).toContain('application/json');
+      });
     });
-  });
-
-  it('returns JSON content-type when GET /health is called', async () => {
-    // Arrange
-    const request = { method: 'GET' as const, url: '/health' };
-
-    // Act
-    const response = await app.inject(request);
-
-    // Assert
-    expect(response.headers['content-type']).toContain('application/json');
   });
 });

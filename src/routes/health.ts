@@ -3,7 +3,7 @@ import type { HealthResponse } from '../contracts';
 
 export const healthRoutes: FastifyPluginAsync<{ version: string }> = async (app, options) => {
   app.get<{ Reply: HealthResponse }>(
-    '/health',
+    '/v1/health',
     {
       schema: {
         response: {

@@ -14,7 +14,7 @@ const errorResponseSchema = {
 
 export const debugRoutes: FastifyPluginAsync = async (app) => {
   app.post<{ Reply: ErrorResponse }>(
-    '/debug',
+    '/v1/debug',
     {
       schema: {
         response: {

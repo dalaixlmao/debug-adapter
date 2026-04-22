@@ -11,15 +11,18 @@ describe('Debug API', () => {
   });
 
   it('returns 501 for POST /v1/debug with JSON body', async () => {
-    const response = await app.inject({
-      method: 'POST',
+    // Arrange
+    const request = {
+      method: 'POST' as const,
       url: '/v1/debug',
-      headers: {
-        'content-type': 'application/json',
-      },
+      headers: { 'content-type': 'application/json' },
       payload: JSON.stringify({ foo: 'bar' }),
-    });
+    };
 
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
     expect(response.statusCode).toBe(501);
     expect(response.headers['content-type']).toContain('application/json');
     expect(JSON.parse(response.payload)).toEqual({
@@ -29,15 +32,18 @@ describe('Debug API', () => {
   });
 
   it('returns 415 for POST /v1/debug with text/plain body', async () => {
-    const response = await app.inject({
-      method: 'POST',
+    // Arrange
+    const request = {
+      method: 'POST' as const,
       url: '/v1/debug',
-      headers: {
-        'content-type': 'text/plain',
-      },
+      headers: { 'content-type': 'text/plain' },
       payload: 'plain text body',
-    });
+    };
 
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
     expect(response.statusCode).toBe(415);
     expect(JSON.parse(response.payload)).toEqual({
       error: 'Unsupported Media Type',
@@ -46,11 +52,13 @@ describe('Debug API', () => {
   });
 
   it('returns 404 for GET /v1/debug', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: '/v1/debug',
-    });
+    // Arrange
+    const request = { method: 'GET' as const, url: '/v1/debug' };
 
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
     expect(response.statusCode).toBe(404);
   });
 });

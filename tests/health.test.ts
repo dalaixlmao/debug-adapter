@@ -16,11 +16,13 @@ afterAll(async () => {
 
 describe('Health API', () => {
   it('returns 200 and the expected JSON payload', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: '/health',
-    });
+    // Arrange
+    const request = { method: 'GET' as const, url: '/health' };
 
+    // Act
+    const response = await app.inject(request);
+
+    // Assert
     expect(response.statusCode).toBe(200);
     expect(response.headers['content-type']).toContain('application/json');
 

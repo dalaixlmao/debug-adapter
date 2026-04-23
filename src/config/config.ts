@@ -33,6 +33,12 @@ export const DAP_SESSION_ADAPTER_ID = 'debug-adapter';
 export const DAP_DEFAULT_THREAD_ID  = 1;
 export const DAP_LOCAL_SCOPE_NAME   = 'Locals';
 
+export const VAR_STRING_MAX_CHARS    = 1024;
+export const VAR_FALLBACK_MAX_CHARS  = 256;
+export const VAR_TRUNCATED_SUFFIX    = '[truncated]';
+export const VAR_CIRCULAR_MARKER     = '<circular reference>';
+export const VAR_CIRCULAR_INDICATORS = ['...', '<Recursion>'] as const;
+
 export const config =  {
   PORT:                   parseInt(process.env.PORT ?? DEFAULT_PORT.toString(), 10),
   HOST:                   process.env.HOST || '0.0.0.0',

@@ -4,6 +4,7 @@ import { HealthService } from './services/health.service';
 import { HealthController } from './controllers/health.controller';
 import { DebugController } from './controllers/debug.controller';
 import { StepCollector } from './services/step-collector';
+import { VariableSerializer } from './services/variable-serializer';
 
 const packageJsonPath = path.join(__dirname, '../package.json');
 const packageJsonRaw: unknown = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
@@ -22,3 +23,4 @@ const healthService = new HealthService();
 export const healthController = new HealthController(healthService, version);
 export const debugController = new DebugController();
 export const stepCollector = new StepCollector();
+export const variableSerializer = new VariableSerializer();

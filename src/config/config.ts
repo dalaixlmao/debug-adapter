@@ -23,6 +23,10 @@ export const LANGUAGE_FILE_EXTENSION: Record<string, string> = {
   golang:     'go',
 } as const;
 
+export const DAP_SESSION_CLIENT_ID  = 'debug-adapter';
+export const DAP_SESSION_ADAPTER_ID = 'debug-adapter';
+export const DAP_DEFAULT_THREAD_ID  = 1;
+
 export const config =  {
   PORT:                   parseInt(process.env.PORT ?? DEFAULT_PORT.toString(), 10),
   HOST:                   process.env.HOST || '0.0.0.0',

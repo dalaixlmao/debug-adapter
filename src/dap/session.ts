@@ -7,6 +7,7 @@ import type {
   DAPScope,
   DAPVariable,
   DAPEventName,
+  StepOutcome,
 } from '../contracts/dap';
 import { DAP_SESSION_CLIENT_ID, DAP_SESSION_ADAPTER_ID, DAP_DEFAULT_THREAD_ID } from '../config/config';
 
@@ -33,10 +34,10 @@ export class DAPSession implements IDAPSession {
     await stoppedPromise;
   }
 
-  async stepIn(): Promise<void> {
-    const stoppedPromise = this.waitForEvent('stopped');
+  async stepIn(): Promise<StepOutcome> {
+    const outcome = this.raceStoppedOrTerminated();
     await this.client.sendRequest('stepIn', { threadId: DAP_DEFAULT_THREAD_ID });
-    await stoppedPromise;
+    return outcome;
   }
 
   async getStackTrace(threadId: number): Promise<DAPStackFrame[]> {
@@ -57,6 +58,13 @@ export class DAPSession implements IDAPSession {
   async disconnect(): Promise<void> {
     await this.client.sendRequest('disconnect', { terminateDebuggee: true });
     this.client.dispose();
+  }
+
+  private raceStoppedOrTerminated(): Promise<StepOutcome> {
+    return new Promise<StepOutcome>((resolve) => {
+      this.client.on('stopped', () => resolve('stopped'));
+      this.client.on('terminated', () => resolve('terminated'));
+    });
   }
 
   private waitForEvent(eventName: DAPEventName): Promise<void> {

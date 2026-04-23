@@ -31,6 +31,7 @@ export const ADAPTER_STDERR_BUFFER_BYTES = 2048;
 export const DAP_SESSION_CLIENT_ID  = 'debug-adapter';
 export const DAP_SESSION_ADAPTER_ID = 'debug-adapter';
 export const DAP_DEFAULT_THREAD_ID  = 1;
+export const DAP_LOCAL_SCOPE_NAME   = 'Locals';
 
 export const config =  {
   PORT:                   parseInt(process.env.PORT ?? DEFAULT_PORT.toString(), 10),

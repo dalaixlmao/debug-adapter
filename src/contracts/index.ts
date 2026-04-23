@@ -4,3 +4,4 @@ export type { StartSessionRequest, StartSessionResponse, DebugRequest, DebugRequ
 export type { TempFileResult } from './temp-file'
 export type { DAPMessage, DAPRequest, DAPResponse, DAPEvent, DAPEventName, IDAPClient, IDAPSession, AdapterType, DAPCapabilities, DAPStackFrame, DAPScope, DAPVariable } from './dap'
 export type { AdapterHandle } from './adapter'
+export type { StepFrame, IStepCollector } from './step-collector'

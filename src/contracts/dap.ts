@@ -61,10 +61,12 @@ export interface DAPVariable {
   readonly variablesReference: number;
 }
 
+export type StepOutcome = 'stopped' | 'terminated';
+
 export interface IDAPSession {
   initialize(): Promise<DAPCapabilities>;
   launch(filePath: string, adapterType: AdapterType): Promise<void>;
-  stepIn(): Promise<void>;
+  stepIn(): Promise<StepOutcome>;
   getStackTrace(threadId: number): Promise<DAPStackFrame[]>;
   getScopes(frameId: number): Promise<DAPScope[]>;
   getVariables(variablesReference: number): Promise<DAPVariable[]>;

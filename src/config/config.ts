@@ -11,6 +11,17 @@ export const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ['c++', 'java',
 
 export const MAX_CODE_SIZE_BYTES = 65536;
 
+export const TEMP_DIR_PREFIX = 'dap-';
+export const TEMP_DIR_MODE   = 0o700;
+
+export const LANGUAGE_FILE_EXTENSION: Record<string, string> = {
+  python:     'py',
+  javascript: 'js',
+  'c++':      'cpp',
+  java:       'java',
+  golang:     'go',
+} as const;
+
 export const config =  {
   PORT:             parseInt(process.env.PORT ?? DEFAULT_PORT.toString(), 10),
   HOST:             process.env.HOST || '0.0.0.0',

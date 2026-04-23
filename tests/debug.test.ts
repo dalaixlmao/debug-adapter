@@ -282,6 +282,61 @@ describe('Debug API', () => {
       });
     });
 
+    describe('code size validation', () => {
+      it('returns 400 with CODE_TOO_LARGE when code is 65537 bytes', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'python', code: 'x'.repeat(65537) }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+        const body = JSON.parse(response.payload);
+
+        // Assert
+        expect(response.statusCode).toBe(400);
+        expect(body.code).toBe('CODE_TOO_LARGE');
+        expect(body.error).toContain('65537');
+      });
+
+      it('passes code size check when code is exactly 65536 bytes', async () => {
+        // Arrange
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'python', code: 'x'.repeat(65536) }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+
+        // Assert
+        expect(response.statusCode).toBe(501);
+      });
+
+      it('includes actual byte count in error message when code exceeds limit', async () => {
+        // Arrange
+        const overLimit = 'x'.repeat(70000);
+        const request = {
+          method: 'POST' as const,
+          url: '/v1/debug',
+          headers: { 'content-type': 'application/json' },
+          payload: JSON.stringify({ language: 'python', code: overLimit }),
+        };
+
+        // Act
+        const response = await app.inject(request);
+        const body = JSON.parse(response.payload);
+
+        // Assert
+        expect(body.error).toContain('70000');
+      });
+    });
+
     describe('edge cases', () => {
       it('returns 415 with UNSUPPORTED_MEDIA_TYPE error when body is empty and content-type is absent', async () => {
         // Arrange

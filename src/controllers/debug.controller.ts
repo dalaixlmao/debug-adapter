@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { DebugRequest } from '../contracts';
-import { SUPPORTED_LANGUAGES } from '../config/config';
+import { MAX_CODE_SIZE_BYTES, SUPPORTED_LANGUAGES } from '../config/config';
 import { ErrorCode } from '../errors';
 
 export class DebugController {
@@ -18,6 +18,14 @@ export class DebugController {
       return reply.status(400).send({
         error: 'Code must not be empty or whitespace-only',
         code: ErrorCode.EMPTY_CODE,
+      });
+    }
+
+    const byteLength = Buffer.byteLength(request.body.code, 'utf8');
+    if (byteLength > MAX_CODE_SIZE_BYTES) {
+      return reply.status(400).send({
+        error: `Code exceeds 64KB limit (received: ${byteLength} bytes)`,
+        code: ErrorCode.CODE_TOO_LARGE,
       });
     }
 

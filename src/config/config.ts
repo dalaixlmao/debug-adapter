@@ -9,6 +9,8 @@ const DEFAULT_MAX_STEPS        = 100;
 export type SupportedLanguage = 'c++' | 'java' | 'python' | 'javascript' | 'golang';
 export const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ['c++', 'java', 'python', 'javascript', 'golang'];
 
+export const MAX_CODE_SIZE_BYTES = 65536;
+
 export const config =  {
   PORT:             parseInt(process.env.PORT ?? DEFAULT_PORT.toString(), 10),
   HOST:             process.env.HOST || '0.0.0.0',

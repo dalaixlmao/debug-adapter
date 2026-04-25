@@ -1,6 +1,6 @@
 export type { ErrorResponse } from './errors'
 export type { HealthResponse } from './health'
-export type { StartSessionRequest, StartSessionResponse, DebugRequest, DebugRequestOptions } from './debug-session'
+export type { StartSessionRequest, StartSessionResponse, DebugRequest, DebugRequestOptions, DebugResponse, BuildResponseOptions, IResponseBuilder } from './debug-session'
 export type { TempFileResult } from './temp-file'
 export type { DAPMessage, DAPRequest, DAPResponse, DAPEvent, DAPEventName, IDAPClient, IDAPSession, AdapterType, DAPCapabilities, DAPStackFrame, DAPScope, DAPVariable } from './dap'
 export type { AdapterHandle } from './adapter'

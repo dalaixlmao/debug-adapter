@@ -24,6 +24,7 @@ export function spawnPythonAdapter(filePath: string): AdapterHandle {
   }
 
   const getStderr = attachStderrCapture(child);
+  child.on('error', () => { /* handled via getStderr or session timeout */ });
   return { process: child, stdin, stdout, getStderr, kill: () => child.kill('SIGKILL') };
 }
 

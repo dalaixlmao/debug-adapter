@@ -39,6 +39,8 @@ export const VAR_TRUNCATED_SUFFIX    = '[truncated]';
 export const VAR_CIRCULAR_MARKER     = '<circular reference>';
 export const VAR_CIRCULAR_INDICATORS = ['...', '<Recursion>'] as const;
 
+export const HRTIME_NS_PER_MS = 1_000_000;
+
 export const config =  {
   PORT:                   parseInt(process.env.PORT ?? DEFAULT_PORT.toString(), 10),
   HOST:                   process.env.HOST || '0.0.0.0',

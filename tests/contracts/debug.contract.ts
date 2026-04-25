@@ -29,3 +29,10 @@ export const errorResponseContract = {
   error: expect.any(String),
   code: expect.stringMatching(/^[A-Z_]+$/),
 };
+
+export const debugResponseContract = {
+  steps: expect.any(Array),
+  truncated: expect.any(Boolean),
+  total_steps: expect.any(Number),
+  execution_time_ms: expect.any(Number),
+};

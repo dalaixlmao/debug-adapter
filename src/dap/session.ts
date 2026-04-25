@@ -19,7 +19,6 @@ export class DAPSession implements IDAPSession {
 
   async initialize(): Promise<DAPCapabilities> {
     log('sending initialize');
-    const initializedPromise = this.waitForEvent('initialized');
     const response = await this.client.sendRequest('initialize', {
       clientID: DAP_SESSION_CLIENT_ID,
       adapterID: DAP_SESSION_ADAPTER_ID,
@@ -27,21 +26,23 @@ export class DAPSession implements IDAPSession {
       columnsStartAt1: true,
       pathFormat: 'path',
     });
-    log('initialize response received, waiting for initialized event');
-    await initializedPromise;
-    log('initialized event received, sending configurationDone');
-    await this.client.sendRequest('configurationDone');
-    log('configurationDone response received');
+    log('initialize response received');
     return (response.body ?? {}) as DAPCapabilities;
   }
 
   async launch(filePath: string, adapterType: AdapterType): Promise<void> {
     log('sending launch', { filePath, adapterType });
-    const stoppedPromise = this.waitForEvent('stopped');
+    // debugpy sends 'initialized' event after launch (not after initialize)
+    const initializedPromise = this.waitForEvent('initialized');
+    const stoppedPromise     = this.waitForEvent('stopped');
     await this.client.sendRequest('launch', buildLaunchArgs(filePath, adapterType));
-    log('launch response received, waiting for stopped event');
+    log('launch response received, waiting for initialized event');
+    await initializedPromise;
+    log('initialized event received, sending configurationDone');
+    await this.client.sendRequest('configurationDone');
+    log('configurationDone response received, waiting for stopped event');
     await stoppedPromise;
-    log('stopped event received after launch');
+    log('stopped event received — program paused at entry');
   }
 
   async stepIn(): Promise<StepOutcome> {

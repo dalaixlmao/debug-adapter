@@ -30,6 +30,7 @@ export class DAPStream {
   sendRequest(command: string, args?: unknown): Promise<DAPResponse> {
     const seq  = this.seq++;
     const body = JSON.stringify({ seq, type: 'request', command, arguments: args });
+    console.error('[DAPStream] outgoing:', body.slice(0, 300));
     const header = `${CONTENT_LENGTH_PREFIX}${Buffer.byteLength(body, BODY_ENCODING)}${HEADER_SEP}`;
     this.writable.write(header, HEADER_ENCODING);
     this.writable.write(body, BODY_ENCODING);
@@ -78,6 +79,7 @@ export class DAPStream {
   private dispatchMessage(rawBody: string): void {
     let message: unknown;
     try { message = JSON.parse(rawBody); } catch { return; }
+    console.error('[DAPStream] incoming:', rawBody.slice(0, 300));
     if (!isDAPMessage(message)) return;
     if (message.type === 'response') {
       this.handleResponse(message as DAPResponse);

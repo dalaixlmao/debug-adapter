@@ -11,14 +11,10 @@ import type {
 } from '../contracts/dap';
 import { DAP_SESSION_CLIENT_ID, DAP_SESSION_ADAPTER_ID, DAP_DEFAULT_THREAD_ID, config } from '../config/config';
 
-const log = (msg: string, data?: unknown) =>
-  console.error(`[DAPSession] ${msg}`, data !== undefined ? JSON.stringify(data) : '');
-
 export class DAPSession implements IDAPSession {
   constructor(private readonly client: IDAPClient) {}
 
   async initialize(): Promise<DAPCapabilities> {
-    log('sending initialize');
     const response = await this.client.sendRequest('initialize', {
       clientID: DAP_SESSION_CLIENT_ID,
       adapterID: DAP_SESSION_ADAPTER_ID,
@@ -26,40 +22,28 @@ export class DAPSession implements IDAPSession {
       columnsStartAt1: true,
       pathFormat: 'path',
     });
-    log('initialize response received');
     return (response.body ?? {}) as DAPCapabilities;
   }
 
   async launch(filePath: string, adapterType: AdapterType): Promise<void> {
-    log('sending launch', { filePath, adapterType });
     const initializedPromise = this.waitForEvent('initialized');
     const stoppedPromise     = this.waitForEvent('stopped');
     // Don't await launch yet — debugpy responds to it only AFTER configurationDone
     const launchPromise = this.client.sendRequest('launch', buildLaunchArgs(filePath, adapterType));
-    log('waiting for initialized event');
     await initializedPromise;
-    log('initialized event received, sending configurationDone');
     await this.client.sendRequest('configurationDone');
-    log('configurationDone response received, awaiting launch response and stopped event');
     await Promise.all([launchPromise, stoppedPromise]);
-    log('launch complete — program paused at entry');
   }
 
   async stepIn(): Promise<StepOutcome> {
-    log('sending stepIn');
     const outcome = this.raceStoppedOrTerminated();
     await this.client.sendRequest('stepIn', { threadId: DAP_DEFAULT_THREAD_ID });
-    const result = await outcome;
-    log('stepIn outcome', result);
-    return result;
+    return outcome;
   }
 
   async getStackTrace(threadId: number): Promise<DAPStackFrame[]> {
-    log('sending stackTrace', { threadId });
     const response = await this.client.sendRequest('stackTrace', { threadId });
-    const frames = (response.body as { stackFrames: DAPStackFrame[] }).stackFrames;
-    log('stackTrace response', { frameCount: frames.length });
-    return frames;
+    return (response.body as { stackFrames: DAPStackFrame[] }).stackFrames;
   }
 
   async getScopes(frameId: number): Promise<DAPScope[]> {
@@ -73,10 +57,8 @@ export class DAPSession implements IDAPSession {
   }
 
   async disconnect(): Promise<void> {
-    log('sending disconnect');
     await this.client.sendRequest('disconnect', { terminateDebuggee: true });
     this.client.dispose();
-    log('disconnected');
   }
 
   private raceStoppedOrTerminated(): Promise<StepOutcome> {

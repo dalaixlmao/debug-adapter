@@ -55,9 +55,12 @@ function findLocalScope(scopes: DAPScope[]): DAPScope | null {
   return scopes.find(s => s.name === DAP_LOCAL_SCOPE_NAME) ?? null;
 }
 
+const DEBUGPY_INTERNAL_PREFIXES = ['special variables', 'protected variables', 'function variables', 'class variables'];
+
 function buildVariableMap(variables: DAPVariable[]): Record<string, unknown> {
   const map: Record<string, unknown> = {};
   for (const v of variables) {
+    if (DEBUGPY_INTERNAL_PREFIXES.some(p => v.name === p || v.name.startsWith(p))) continue;
     map[v.name] = v.value;
   }
   return map;

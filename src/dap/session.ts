@@ -32,17 +32,17 @@ export class DAPSession implements IDAPSession {
 
   async launch(filePath: string, adapterType: AdapterType): Promise<void> {
     log('sending launch', { filePath, adapterType });
-    // debugpy sends 'initialized' event after launch (not after initialize)
     const initializedPromise = this.waitForEvent('initialized');
     const stoppedPromise     = this.waitForEvent('stopped');
-    await this.client.sendRequest('launch', buildLaunchArgs(filePath, adapterType));
-    log('launch response received, waiting for initialized event');
+    // Don't await launch yet — debugpy responds to it only AFTER configurationDone
+    const launchPromise = this.client.sendRequest('launch', buildLaunchArgs(filePath, adapterType));
+    log('waiting for initialized event');
     await initializedPromise;
     log('initialized event received, sending configurationDone');
     await this.client.sendRequest('configurationDone');
-    log('configurationDone response received, waiting for stopped event');
-    await stoppedPromise;
-    log('stopped event received — program paused at entry');
+    log('configurationDone response received, awaiting launch response and stopped event');
+    await Promise.all([launchPromise, stoppedPromise]);
+    log('launch complete — program paused at entry');
   }
 
   async stepIn(): Promise<StepOutcome> {

@@ -28,6 +28,10 @@ export const PYTHON_ADAPTER_ARGS         = ['-m', 'debugpy.adapter'] as const;
 export const PYTHON_ADAPTER_ENV_KEYS     = ['PATH', 'HOME', 'TMPDIR'] as const;
 export const ADAPTER_STDERR_BUFFER_BYTES = 2048;
 
+export const JS_ADAPTER_COMMAND          = 'node';
+export const JS_ADAPTER_ENV_KEYS         = ['PATH', 'HOME', 'TMPDIR', 'NODE_PATH'] as const;
+export const JS_DEBUG_ADAPTER_SCRIPT_ENV = 'JS_DEBUG_ADAPTER_SCRIPT';
+
 export const DAP_SESSION_CLIENT_ID  = 'debug-adapter';
 export const DAP_SESSION_ADAPTER_ID = 'debug-adapter';
 export const DAP_DEFAULT_THREAD_ID  = 1;

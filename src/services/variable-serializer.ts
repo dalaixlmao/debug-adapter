@@ -39,10 +39,14 @@ function serializeByType(type: string | undefined, value: string): JsonSafeValue
   if (normalizedType === 'nonetype' || normalizedType === 'null' || normalizedType === 'undefined') {
     return null;
   }
+  if (normalizedType === 'bigint') return value;
+  if (normalizedType === 'symbol') return value;
+  if (normalizedType === 'function') return parseFunctionValue(value);
   return truncate(value, VAR_FALLBACK_MAX_CHARS);
 }
 
 function parseNumber(value: string): JsonSafeValue {
+  if (value === 'NaN' || value === 'Infinity' || value === '-Infinity') return value;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : truncate(value, VAR_FALLBACK_MAX_CHARS);
 }
@@ -66,6 +70,11 @@ function stripOuterQuotes(value: string): string {
     return value.slice(1, -1);
   }
   return value;
+}
+
+function parseFunctionValue(value: string): string {
+  const match = /^function\s+(\w+)/.exec(value);
+  return `<${match ? match[1] : 'anonymous'}>`;
 }
 
 function truncate(value: string, maxChars: number): string {

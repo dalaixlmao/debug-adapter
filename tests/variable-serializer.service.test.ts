@@ -112,6 +112,68 @@ describe('VariableSerializer.serialize', () => {
     });
   });
 
+  describe('JS-specific types', () => {
+    it('returns null when type is "undefined"', () => {
+      const result = serializer.serialize(makeVar({ type: 'undefined', value: 'undefined' }));
+      expect(result).toBeNull();
+    });
+
+    it('returns number 42 when type is "number" and value is "42"', () => {
+      const result = serializer.serialize(makeVar({ type: 'number', value: '42' }));
+      expect(result).toBe(42);
+    });
+
+    it('returns string "hello" when type is "string" and value is "hello"', () => {
+      const result = serializer.serialize(makeVar({ type: 'string', value: 'hello' }));
+      expect(result).toBe('hello');
+    });
+
+    it('returns boolean true when type is "boolean" and value is "true"', () => {
+      const result = serializer.serialize(makeVar({ type: 'boolean', value: 'true' }));
+      expect(result).toBe(true);
+    });
+
+    it('returns string "NaN" when type is "number" and value is "NaN"', () => {
+      const result = serializer.serialize(makeVar({ type: 'number', value: 'NaN' }));
+      expect(result).toBe('NaN');
+    });
+
+    it('returns string "Infinity" when type is "number" and value is "Infinity"', () => {
+      const result = serializer.serialize(makeVar({ type: 'number', value: 'Infinity' }));
+      expect(result).toBe('Infinity');
+    });
+
+    it('returns string "-Infinity" when type is "number" and value is "-Infinity"', () => {
+      const result = serializer.serialize(makeVar({ type: 'number', value: '-Infinity' }));
+      expect(result).toBe('-Infinity');
+    });
+
+    it('returns BigInt string representation when type is "bigint"', () => {
+      const result = serializer.serialize(makeVar({ type: 'bigint', value: '9007199254740993n' }));
+      expect(result).toBe('9007199254740993n');
+    });
+
+    it('returns Symbol string when type is "symbol"', () => {
+      const result = serializer.serialize(makeVar({ type: 'symbol', value: 'Symbol(foo)' }));
+      expect(result).toBe('Symbol(foo)');
+    });
+
+    it('returns Symbol string for symbol with no description', () => {
+      const result = serializer.serialize(makeVar({ type: 'symbol', value: 'Symbol()' }));
+      expect(result).toBe('Symbol()');
+    });
+
+    it('returns "<functionName>" when type is "function" and value has a named function', () => {
+      const result = serializer.serialize(makeVar({ type: 'function', value: 'function myFunc() {}' }));
+      expect(result).toBe('<myFunc>');
+    });
+
+    it('returns "<anonymous>" when type is "function" and value has an anonymous function', () => {
+      const result = serializer.serialize(makeVar({ type: 'function', value: 'function () {}' }));
+      expect(result).toBe('<anonymous>');
+    });
+  });
+
   describe('fallback for unknown types', () => {
     it('returns value string as-is when type is unrecognized and under 256 chars', () => {
       const result = serializer.serialize(makeVar({ type: 'MyClass', value: 'SomeRepr' }));

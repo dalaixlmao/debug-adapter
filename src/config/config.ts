@@ -23,7 +23,7 @@ export const LANGUAGE_FILE_EXTENSION: Record<string, string> = {
   golang:     'go',
 } as const;
 
-export const PYTHON_ADAPTER_COMMAND      = 'python';
+export const PYTHON_ADAPTER_COMMAND      = 'python3';
 export const PYTHON_ADAPTER_ARGS         = ['-m', 'debugpy.adapter'] as const;
 export const PYTHON_ADAPTER_ENV_KEYS     = ['PATH', 'HOME', 'TMPDIR'] as const;
 export const ADAPTER_STDERR_BUFFER_BYTES = 2048;
